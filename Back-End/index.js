@@ -13,7 +13,7 @@ const notFound = require('./middlewares/notFound'); // Importer le gestionnaire 
 app.use(express.json());
 
 // Connexion à la base de données
-dbConnect(); // Établir la connexion avec MongoDB
+// dbConnect(); // Établir la connexion avec MongoDB
 
 // Utilisation de Swagger
 swaggerSetup(app);
