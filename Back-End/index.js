@@ -3,17 +3,26 @@ const app = express();
 const swaggerSetup = require('./docs/swagger');
 const routes = require('./routes/indexRoute.js');
 const cors = require('cors');
-const dbConnect = require('./config/database'); // Importer la fonction de connexion à la base de données
+const { dbConnect,sequelize }  = require('./config/database'); // Importer la fonction de connexion à la base de données
 const { errorHandler } = require('./middlewares/errorHandler'); // Importer le gestionnaire d'erreurs
 const notFound = require('./middlewares/notFound'); // Importer le gestionnaire notFound
 
-
+sequelize
+    .sync({
+        alter: true 
+    })
+    .then(() => {
+        console.log('Database sync successfully');
+    })
+    .catch((err) => {
+        console.log('Erreur: ', err);
+    });
 
 // Middleware pour le parsing des données au format JSON
 app.use(express.json());
 
 // Connexion à la base de données
-// dbConnect(); // Établir la connexion avec MongoDB
+dbConnect(); // Établir la connexion avec MongoDB
 
 // Utilisation de Swagger
 swaggerSetup(app);

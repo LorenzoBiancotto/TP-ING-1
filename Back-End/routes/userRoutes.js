@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const userController = require('../controllers/userController');
 
 /**
  * @swagger
- * /api/users:
+ * /api/users/test:
  *   get:
  *     summary: Retrieve a list of users
  *     responses:
@@ -21,8 +22,24 @@ const router = express.Router();
  *                   name:
  *                     type: string
  */
-router.get('/', (req, res) => {
+router.get('/test', (req, res) => {
     res.json([{ id: 1, name: 'John Doe' }, { id: 2, name: 'Jane Doe' }]);
 });
+
+
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Récupérer tous les utilisateurs
+ *     tags: [Compte]
+ *     responses:
+ *       200:
+ *         description: Succès - Renvoie tous les utilisateurs
+ *       500:
+ *         description: Erreur serveur - Une erreur s'est produite lors de la récupération des utilisateurs
+ */
+router.get('/', userController.getAllUsers);
+
 
 module.exports = router;
