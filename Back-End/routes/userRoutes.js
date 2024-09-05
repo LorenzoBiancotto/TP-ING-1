@@ -1,6 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
+const { authMiddleware } = require('../middlewares/authMiddleware');
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: API pour la gestion des utilisateurs
+ */
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
 
 /**
  * @swagger
@@ -32,6 +50,22 @@ const userController = require('../controllers/userController');
  *         description: Erreur serveur - Une erreur s'est produite lors de la récupération des utilisateurs
  */
 router.get('/', userController.getAllUsers);
+
+/**
+ * @swagger
+ * /api/users/getMe:
+ *   get:
+ *     summary: Récupérer tous les utilisateurs
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Succès - Renvoie tous les utilisateurs
+ *       500:
+ *         description: Erreur serveur - Une erreur s'est produite lors de la récupération des utilisateurs
+ */
+router.get('/getMe', authMiddleware, userController.getUsersMe);
 
 /**
  * @swagger
@@ -132,8 +166,6 @@ router.post('/create', userController.createUser);
  *                 type: string
  *               lastname:
  *                 type: string
- *               email:
- *                 type: string
  *               password:
  *                 type: string
  *               roles:
@@ -141,7 +173,6 @@ router.post('/create', userController.createUser);
  *             example:
  *               firstname: Jean
  *               lastname: Dupont
- *               email: jean.dupont@example.com
  *               password: newSecret123
  *               roles: Admin
  *     responses:
@@ -176,5 +207,36 @@ router.put('/update/:id', userController.updateUser);
  *         description: Erreur serveur - Une erreur s'est produite lors de la suppression de l'utilisateur
  */
 router.delete('/delete/:id', userController.deleteUser);
+
+
+/**
+ * @swagger
+ * /api/users/login:
+ *   post:
+ *     summary: Connexion d'un utilisateur
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             example:
+ *               email: jean.dupont@example.com
+ *               password: secret123
+ *     responses:
+ *       200:
+ *         description: Succès - Renvoie un message de connexion réussie
+ *       401:
+ *         description: Non autorisé - Les informations d'identification sont incorrectes
+ *       500:
+ *         description: Erreur serveur - Une erreur s'est produite lors de la connexion
+ */
+router.post('/login', userController.login);
 
 module.exports = router;
