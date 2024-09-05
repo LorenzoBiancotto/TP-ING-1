@@ -11,17 +11,6 @@ exports.getAllUsers = async (req, res) => {
     }
 };
 
-// Récupérer tous les utilisateurs (READ)
-exports.getAllUsers = async (req, res) => {
-    try {
-        const users = await User.findAll();
-        res.json(users);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Une erreur est survenue' });
-    }
-};
-
 // Récupérer un utilisateur par son ID (READ)
 exports.getUserById = async (req, res) => {
     try {
@@ -40,7 +29,6 @@ exports.getUserById = async (req, res) => {
 // Créer un nouvel utilisateur (CREATE)
 exports.createUser = async (req, res) => {
     try {
-        console.log(req.body);
         const { firstname, lastname, email, password, roles } = req.body;
 
         // Vérifier que toutes les données sont présentes
@@ -57,10 +45,10 @@ exports.createUser = async (req, res) => {
             roles,
         });
 
-        res.status(201).json(newUser);
+        res.status(200).json(newUser);
     } catch (error) {
         console.error('Erreur lors de la création de l\'utilisateur :', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: error });
     }
 };
 
@@ -82,7 +70,7 @@ exports.updateUser = async (req, res) => {
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Une erreur est survenue lors de la mise à jour de l\'utilisateur' });
+        res.status(500).json({ error: error });
     }
 };
 

@@ -101,7 +101,7 @@ router.get('/:id', userController.getUserById);
  *               password: secret123
  *               roles: Admin
  *     responses:
- *       201:
+ *       200:
  *         description: Succès - Utilisateur créé
  *       500:
  *         description: Erreur serveur - Une erreur s'est produite lors de la création de l'utilisateur

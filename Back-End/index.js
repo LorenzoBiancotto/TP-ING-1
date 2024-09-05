@@ -27,9 +27,13 @@ dbConnect(); // Établir la connexion avec MongoDB
 // Utilisation de Swagger
 swaggerSetup(app);
 
+// Port d'écoute du serveur
+const port = process.env.PORT;
+
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || ['http://localhost:3000'].indexOf(origin) !== -1) {
+        // Autoriser les requêtes avec une origine non définie (par exemple, requêtes cURL) ou de localhost:3000
+        if (!origin || ['http://localhost:3000','http://localhost:'+port].indexOf(origin) !== -1) {
             callback(null, true);  // Origine autorisée
         } else {
             callback(new Error('URL not allowed by CORS'));  // Origine non autorisée
@@ -45,12 +49,12 @@ app.use(cors({
 // Utilisation des routes
 app.use('/api', routes); // Toutes les routes commencent par '/api'
 
+
 app.use(notFound);
 app.use(errorHandler);
 
 
-// Port d'écoute du serveur
-const port = process.env.PORT;
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
