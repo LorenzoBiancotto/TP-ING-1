@@ -126,6 +126,8 @@ router.get('/:id', userController.getUserById);
  *                 type: string
  *               password:
  *                 type: string
+ *               confirmPassword:
+ *                 type: string
  *               roles:
  *                 type: string
  *             example:
@@ -133,6 +135,7 @@ router.get('/:id', userController.getUserById);
  *               lastname: Dupont
  *               email: jean.dupont@example.com
  *               password: secret123
+ *               confirmPassword: secret123
  *               roles: Admin
  *     responses:
  *       200:

@@ -8,7 +8,7 @@ const secretKey = 'synexis_13013';
 // Récupérer tous les utilisateurs
 exports.getAllUsers = async (req, res) => {
     try {
-        const users = await User.findAll();
+        const users = await User.findAll({ attributes: { exclude: ['password'] } });
         res.json(users);
     } catch (error) {
         console.error(error);
@@ -18,7 +18,7 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUsersMe = async (req, res) => {
     try {
-        const userId = req.user.userId;
+        const userId = req.user.userId.trim();
         const users = await User.findByPk(userId, { attributes: { exclude: ['password'] } });
         res.json(users);
     } catch (error) {
@@ -30,7 +30,8 @@ exports.getUsersMe = async (req, res) => {
 // Récupérer un utilisateur par son ID (READ)
 exports.getUserById = async (req, res) => {
     try {
-        const user = await User.findByPk(req.params.id);
+        const idUser = req.params.id.trim()
+        const user = await User.findByPk(idUser);
         if (user) {
             res.json(user);
         } else {
@@ -48,19 +49,37 @@ const isValidEmail = (email) => {
     return emailRegex.test(email);
 };
 
+const isValidPassword = (password) => {
+    // Regex qui vérifie tous les critères pour un mot de passe sécurisé
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,}$/;
+
+    // Utilisation de la méthode `test` pour vérifier si le mot de passe correspond à la regex
+    return passwordRegex.test(password);
+};
+
 // Créer un nouvel utilisateur (CREATE)
 exports.createUser = async (req, res) => {
     try {
-        const { firstname, lastname, email, password, roles } = req.body;
+        const { firstname, lastname, email, password,confirmPassword, roles } = req.body;
 
         // Vérifier que toutes les données sont présentes
-        if (!firstname || !lastname || !email || !password) {
+        if (!firstname.trim() || !lastname.trim() || !email.trim() || !password.trim() || !confirmPassword.trim() || !roles.trim()) {
             return res.status(400).json({ error: 'Tous les champs sont obligatoires' });
         }
 
         // Vérifier la structure de l'adresse e-mail
+        if (!isValidPassword(password)) {
+            return res.status(400).json({ error: 'Le mot de passe fournie est invalide' });
+        }
+        
+        // Vérifier la structure de l'adresse e-mail
         if (!isValidEmail(email)) {
             return res.status(400).json({ error: 'L\'adresse e-mail fournie est invalide' });
+        }
+
+        // Vérifier la correspondance des mots de passe
+        if (password !== confirmPassword) {
+            return res.status(400).json({ error: 'La confirmation du mot de passe ne correspond pas.' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -74,7 +93,7 @@ exports.createUser = async (req, res) => {
             roles,
         });
 
-        res.status(201).json(newUser); // Utiliser 201 pour indiquer que l'utilisateur a été créé
+        res.status(200).json({ message: 'Votre compte a été créé avec succès.' });
     } catch (error) {
         console.error('Erreur lors de la création de l\'utilisateur :', error);
         res.status(500).json({ error: 'Une erreur est survenue lors de la création de l\'utilisateur' });
@@ -105,7 +124,8 @@ exports.updateUser = async (req, res) => {
 // Supprimer un utilisateur (DELETE)
 exports.deleteUser = async (req, res) => {
     try {
-        const user = await User.findByPk(req.params.id);
+        const idUser = req.params.id.trim()
+        const user = await User.findByPk(idUser);
         if (user) {
             await user.destroy();
             res.json({ message: 'Utilisateur supprimé avec succès' });
@@ -133,7 +153,7 @@ exports.login = async (req, res) => {
         }
 
         // Vérifier le mot de passe
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await bcrypt.compare(password.trim(), user.password);
 
         if (!isPasswordValid) {
             // Le mot de passe est incorrect
