@@ -26,6 +26,8 @@ const { authMiddleware } = require('../middlewares/authMiddleware');
  *   get:
  *     summary: Récupérer tous les utilisateurs
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Succès - Renvoie tous les utilisateurs
@@ -49,7 +51,38 @@ const { authMiddleware } = require('../middlewares/authMiddleware');
  *       500:
  *         description: Erreur serveur - Une erreur s'est produite lors de la récupération des utilisateurs
  */
-router.get('/', userController.getAllUsers);
+router.get('/',authMiddleware, userController.getAllUsers);
+
+/**
+ * @swagger
+ * /api/users/test:
+ *   get:
+ *     summary: Récupérer tous les utilisateurs
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Succès - Renvoie tous les utilisateurs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   firstname:
+ *                     type: string
+ *                   lastname:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *                   roles:
+ *                     type: string
+ *       500:
+ *         description: Erreur serveur - Une erreur s'est produite lors de la récupération des utilisateurs
+ */
+router.get('/test', userController.getAllUsersTest);
 
 /**
  * @swagger
@@ -134,8 +167,8 @@ router.get('/:id', userController.getUserById);
  *               firstname: Jean
  *               lastname: Dupont
  *               email: jean.dupont@example.com
- *               password: secret123
- *               confirmPassword: secret123
+ *               password: P@ssword123
+ *               confirmPassword: P@ssword123
  *               roles: Admin
  *     responses:
  *       200:
@@ -147,17 +180,12 @@ router.post('/create', userController.createUser);
 
 /**
  * @swagger
- * /api/users/update/{id}:
+ * /api/users/updateInfo:
  *   put:
  *     summary: Mettre à jour un utilisateur
  *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: ID de l'utilisateur
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -169,15 +197,9 @@ router.post('/create', userController.createUser);
  *                 type: string
  *               lastname:
  *                 type: string
- *               password:
- *                 type: string
- *               roles:
- *                 type: string
  *             example:
  *               firstname: Jean
  *               lastname: Dupont
- *               password: newSecret123
- *               roles: Admin
  *     responses:
  *       200:
  *         description: Succès - Utilisateur mis à jour
@@ -186,21 +208,78 @@ router.post('/create', userController.createUser);
  *       500:
  *         description: Erreur serveur - Une erreur s'est produite lors de la mise à jour de l'utilisateur
  */
-router.put('/update/:id', userController.updateUser);
+router.put('/updateInfo',authMiddleware, userController.updateUserInfo);
 
 /**
  * @swagger
- * /api/users/delete/{id}:
+ * /api/users/updateRole:
+ *   put:
+ *     summary: Mettre à jour un utilisateur
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               role:
+ *                 type: string
+ *             example:
+ *               role: Membre
+ *     responses:
+ *       200:
+ *         description: Succès - Utilisateur mis à jour
+ *       404:
+ *         description: Utilisateur non trouvé
+ *       500:
+ *         description: Erreur serveur - Une erreur s'est produite lors de la mise à jour de l'utilisateur
+ */
+router.put('/updateRole',authMiddleware, userController.updateUserRole);
+
+/**
+ * @swagger
+ * /api/users/updatePassword:
+ *   put:
+ *     summary: Mettre à jour un utilisateur
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *               confirmPassword:
+ *                 type: string
+ *             example:
+ *               password: P@ssword1234
+ *               confirmPassword: P@ssword1234
+ *     responses:
+ *       200:
+ *         description: Succès - Utilisateur mis à jour
+ *       404:
+ *         description: Utilisateur non trouvé
+ *       500:
+ *         description: Erreur serveur - Une erreur s'est produite lors de la mise à jour de l'utilisateur
+ */
+router.put('/updatePassword',authMiddleware, userController.updateUserPassword);
+
+
+/**
+ * @swagger
+ * /api/users/delete:
  *   delete:
  *     summary: Supprimer un utilisateur
  *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: ID de l'utilisateur
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Succès - Utilisateur supprimé
@@ -209,7 +288,7 @@ router.put('/update/:id', userController.updateUser);
  *       500:
  *         description: Erreur serveur - Une erreur s'est produite lors de la suppression de l'utilisateur
  */
-router.delete('/delete/:id', userController.deleteUser);
+router.delete('/delete/:id',authMiddleware, userController.deleteUser);
 
 
 /**
@@ -231,7 +310,7 @@ router.delete('/delete/:id', userController.deleteUser);
  *                 type: string
  *             example:
  *               email: jean.dupont@example.com
- *               password: secret123
+ *               password: P@ssword123
  *     responses:
  *       200:
  *         description: Succès - Renvoie un message de connexion réussie

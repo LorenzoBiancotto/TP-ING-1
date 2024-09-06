@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const secretKey = 'synexis_13013';
 
 // Récupérer tous les utilisateurs
-exports.getAllUsers = async (req, res) => {
+exports.getAllUsersTest = async (req, res) => {
     try {
         const users = await User.findAll({ attributes: { exclude: ['password'] } });
         res.json(users);
@@ -16,9 +16,26 @@ exports.getAllUsers = async (req, res) => {
     }
 };
 
+// Récupérer tous les utilisateurs
+exports.getAllUsers = async (req, res) => {
+    try {
+        const userRole = req.user.role;
+        
+        if (userRole == 'Admin') {
+            const users = await User.findAll({ attributes: { exclude: ['password'] } });
+            res.json(users);
+        }else{
+            res.status(404).json({ error: 'Accès refusé' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Une erreur est survenue' });
+    }
+};
+
 exports.getUsersMe = async (req, res) => {
     try {
-        const userId = req.user.userId.trim();
+        const userId = req.user.userId;
         const users = await User.findByPk(userId, { attributes: { exclude: ['password'] } });
         res.json(users);
     } catch (error) {
@@ -30,8 +47,8 @@ exports.getUsersMe = async (req, res) => {
 // Récupérer un utilisateur par son ID (READ)
 exports.getUserById = async (req, res) => {
     try {
-        const idUser = req.params.id.trim()
-        const user = await User.findByPk(idUser);
+        const idUser = req.params.id
+        const user = await User.findByPk(idUser.trim());
         if (user) {
             res.json(user);
         } else {
@@ -101,20 +118,92 @@ exports.createUser = async (req, res) => {
 };
 
 // Mettre à jour un utilisateur (UPDATE)
-exports.updateUser = async (req, res) => {
-    const { firstname, lastname, password, roles } = req.body;
+exports.updateUserInfo = async (req, res) => {
+    const userId = req.user.userId;
+    const { firstname, lastname } = req.body;
+
     try {
-        const user = await User.findByPk(req.params.id);
-        if (user) {
-            user.firstname = firstname;
-            user.lastname = lastname;
-            user.password = password;
-            user.roles = roles;
-            await user.save();
-            res.json(user);
-        } else {
-            res.status(404).json({ error: 'Utilisateur non trouvé' });
+        const user = await User.findByPk(userId);
+        if (!user) {
+            // L'utilisateur n'existe pas
+            return res.status(404).json({ error: 'Utilisateur non trouvé.' });
         }
+        if (!firstname.trim() && !lastname.trim()) {
+            return res.status(400).json({ error: 'Minimum un champs obligatoires' });
+        }
+
+            if (firstname) user.firstname = firstname;
+            if (lastname) user.lastname = lastname;
+
+            await user.save();
+            res.status(200).json({ message: 'Information de votre compte a été modifier avec succès.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error });
+    }
+};
+
+exports.updateUserRole = async (req, res) => {
+    const userId = req.user.userId;
+    const { role } = req.body;
+
+    try {
+        const user = await User.findByPk(userId);
+        if (!user) {
+            // L'utilisateur n'existe pas
+            return res.status(404).json({ error: 'Utilisateur non trouvé.' });
+        }
+
+            if (role.trim()) 
+                {
+                    user.roles = role.trim();
+                    
+                    await user.save();
+                    res.status(200).json({ message: 'Information de votre compte a été modifier avec succès.' });
+                }
+            else {
+                return res.status(404).json({ error: 'Champ non remplie' });
+            }
+
+            
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error });
+    }
+};
+
+
+exports.updateUserPassword = async (req, res) => {
+    const userId = req.user.userId;
+    const { password,confirmPassword } = req.body;
+
+    try {
+        const user = await User.findByPk(userId);
+        if (!user) {
+            // L'utilisateur n'existe pas
+            return res.status(404).json({ error: 'Utilisateur non trouvé.' });
+        }
+        if (!password.trim() || !confirmPassword.trim()) {
+            return res.status(400).json({ error: 'Tous les champs sont obligatoires' });
+        }
+
+        // Vérifier la structure de l'adresse e-mail
+        if (!isValidPassword(password)) {
+            return res.status(400).json({ error: 'Le mot de passe fournie est invalide' });
+        }
+
+        // Vérifier la correspondance des mots de passe
+        if (password !== confirmPassword) {
+            return res.status(400).json({ error: 'La confirmation du mot de passe ne correspond pas.' });
+        }else{
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+            user.password = hashedPassword;
+            
+            await user.save();
+            res.status(200).json({ message: 'Information de votre compte a été modifier avec succès.' });
+        }
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: error });
@@ -123,9 +212,9 @@ exports.updateUser = async (req, res) => {
 
 // Supprimer un utilisateur (DELETE)
 exports.deleteUser = async (req, res) => {
+    const userId = req.user.userId;
     try {
-        const idUser = req.params.id.trim()
-        const user = await User.findByPk(idUser);
+        const user = await User.findByPk(userId);
         if (user) {
             await user.destroy();
             res.json({ message: 'Utilisateur supprimé avec succès' });
@@ -162,7 +251,7 @@ exports.login = async (req, res) => {
 
         // Le mot de passe est correct, et le compte est activé
         // Générer le token JWT
-        const token = jwt.sign({ userId: user.id, role: user.role, email: user.email, firstname: user.firstname, lastname: user.lastname }, secretKey);
+        const token = jwt.sign({ userId: user.id, role: user.roles, email: user.email, firstname: user.firstname, lastname: user.lastname }, secretKey);
 
         res.json({ message: 'Connexion réussie', token });
     } catch (error) {
