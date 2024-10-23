@@ -6,18 +6,18 @@ const productController = require('../controllers/productController'); // Assure
  * @swagger
  * tags:
  *   name: Products
- *   description: API pour la gestion des réservations
+ *   description: API pour la gestion des produits
  */
 
 /**
  * @swagger
  * /api/products:
  *   get:
- *     summary: Récupérer toutes les réservations
+ *     summary: Récupérer tous les produits
  *     tags: [Products]
  *     responses:
  *       200:
- *         description: Succès - Renvoie toutes les réservations
+ *         description: Succès - Renvoie tous les produits
  *         content:
  *           application/json:
  *             schema:
@@ -27,17 +27,12 @@ const productController = require('../controllers/productController'); // Assure
  *                 properties:
  *                   id:
  *                     type: integer
- *                   userId:
- *                     type: integer
- *                   productId:
- *                     type: integer
- *                   reservationDate:
+ *                   name:
  *                     type: string
- *                     format: date-time
- *                   status:
+ *                   description:
  *                     type: string
  *       500:
- *         description: Erreur serveur - Une erreur s'est produite lors de la récupération des réservations
+ *         description: Erreur serveur - Une erreur s'est produite lors de la récupération des produits
  */
 router.get('/', productController.getAllProducts);
 
@@ -45,7 +40,7 @@ router.get('/', productController.getAllProducts);
  * @swagger
  * /api/products/{id}:
  *   get:
- *     summary: Récupérer une réservation par ID
+ *     summary: Récupérer un produit par ID
  *     tags: [Products]
  *     parameters:
  *       - in: path
@@ -53,10 +48,10 @@ router.get('/', productController.getAllProducts);
  *         schema:
  *           type: integer
  *         required: true
- *         description: ID de la réservation
+ *         description: ID du produit
  *     responses:
  *       200:
- *         description: Succès - Renvoie la réservation correspondante
+ *         description: Succès - Renvoie le produit correspondant
  *         content:
  *           application/json:
  *             schema:
@@ -64,19 +59,14 @@ router.get('/', productController.getAllProducts);
  *               properties:
  *                 id:
  *                   type: integer
- *                 userId:
- *                   type: integer
- *                 productId:
- *                   type: integer
- *                 reservationDate:
+ *                 name:
  *                   type: string
- *                   format: date-time
- *                 status:
+ *                 description:
  *                   type: string
  *       404:
- *         description: Réservation non trouvée
+ *         description: Produit non trouvé
  *       500:
- *         description: Erreur serveur - Une erreur s'est produite lors de la récupération de la réservation
+ *         description: Erreur serveur - Une erreur s'est produite lors de la récupération du produit
  */
 router.get('/:id', productController.getProductById);
 
@@ -84,7 +74,7 @@ router.get('/:id', productController.getProductById);
  * @swagger
  * /api/products/create:
  *   post:
- *     summary: Créer une nouvelle réservation
+ *     summary: Créer un nouveau produit
  *     tags: [Products]
  *     requestBody:
  *       required: true
@@ -93,27 +83,20 @@ router.get('/:id', productController.getProductById);
  *           schema:
  *             type: object
  *             properties:
- *               userId:
- *                 type: integer
- *               productId:
- *                 type: integer
- *               reservationDate:
+ *               name:
  *                 type: string
- *                 format: date-time
- *               status:
+ *               description:
  *                 type: string
  *             example:
- *               userId: 1
- *               productId: 1
- *               reservationDate: 2024-09-05T12:00:00Z
- *               status: Reserved
+ *               name: Nouveau produit
+ *               description: Description du produit
  *     responses:
  *       201:
- *         description: Succès - Réservation créée
+ *         description: Succès - produit créé
  *       400:
  *         description: Mauvaise requête - Les champs requis sont manquants
  *       500:
- *         description: Erreur serveur - Une erreur s'est produite lors de la création de la réservation
+ *         description: Erreur serveur - Une erreur s'est produite lors de la création du produit
  */
 router.post('/create', productController.createProduct);
 
@@ -121,7 +104,7 @@ router.post('/create', productController.createProduct);
  * @swagger
  * /api/products/update/{id}:
  *   put:
- *     summary: Mettre à jour une réservation
+ *     summary: Mettre à jour un produit
  *     tags: [Products]
  *     parameters:
  *       - in: path
@@ -129,7 +112,7 @@ router.post('/create', productController.createProduct);
  *         schema:
  *           type: integer
  *         required: true
- *         description: ID de la réservation
+ *         description: ID du produit
  *     requestBody:
  *       required: true
  *       content:
@@ -137,21 +120,20 @@ router.post('/create', productController.createProduct);
  *           schema:
  *             type: object
  *             properties:
- *               reservationDate:
+ *               name:
  *                 type: string
- *                 format: date-time
- *               status:
+ *               description:
  *                 type: string
  *             example:
- *               reservationDate: 2024-09-10T12:00:00Z
- *               status: Confirmed
+ *               name: Produit mis à jour
+ *               description: Description mise à jour
  *     responses:
  *       200:
- *         description: Succès - Réservation mise à jour
+ *         description: Succès - produit mis à jour
  *       404:
- *         description: Réservation non trouvée
+ *         description: Produit non trouvé
  *       500:
- *         description: Erreur serveur - Une erreur s'est produite lors de la mise à jour de la réservation
+ *         description: Erreur serveur - Une erreur s'est produite lors de la mise à jour du produit
  */
 router.put('/update/:id', productController.updateProduct);
 
@@ -159,7 +141,7 @@ router.put('/update/:id', productController.updateProduct);
  * @swagger
  * /api/products/delete/{id}:
  *   delete:
- *     summary: Supprimer une réservation
+ *     summary: Supprimer un produit
  *     tags: [Products]
  *     parameters:
  *       - in: path
@@ -167,14 +149,14 @@ router.put('/update/:id', productController.updateProduct);
  *         schema:
  *           type: integer
  *         required: true
- *         description: ID de la réservation
+ *         description: ID du produit
  *     responses:
  *       200:
- *         description: Succès - Réservation supprimée
+ *         description: Succès - produit supprimé
  *       404:
- *         description: Réservation non trouvée
+ *         description: Produit non trouvé
  *       500:
- *         description: Erreur serveur - Une erreur s'est produite lors de la suppression de la réservation
+ *         description: Erreur serveur - Une erreur s'est produite lors de la suppression du produit
  */
 router.delete('/delete/:id', productController.deleteProduct);
 

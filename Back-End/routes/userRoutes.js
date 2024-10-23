@@ -53,36 +53,6 @@ const { authMiddleware } = require('../middlewares/authMiddleware');
  */
 router.get('/',authMiddleware, userController.getAllUsers);
 
-/**
- * @swagger
- * /api/users/test:
- *   get:
- *     summary: Récupérer tous les utilisateurs
- *     tags: [Users]
- *     responses:
- *       200:
- *         description: Succès - Renvoie tous les utilisateurs
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                   firstname:
- *                     type: string
- *                   lastname:
- *                     type: string
- *                   email:
- *                     type: string
- *                   roles:
- *                     type: string
- *       500:
- *         description: Erreur serveur - Une erreur s'est produite lors de la récupération des utilisateurs
- */
-router.get('/test', userController.getAllUsersTest);
 
 /**
  * @swagger
@@ -288,7 +258,7 @@ router.put('/updatePassword',authMiddleware, userController.updateUserPassword);
  *       500:
  *         description: Erreur serveur - Une erreur s'est produite lors de la suppression de l'utilisateur
  */
-router.delete('/delete/:id',authMiddleware, userController.deleteUser);
+router.delete('/delete',authMiddleware, userController.deleteUser);
 
 
 /**

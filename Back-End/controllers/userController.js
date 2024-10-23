@@ -5,16 +5,6 @@ const jwt = require('jsonwebtoken');
 
 const secretKey = 'synexis_13013';
 
-// Récupérer tous les utilisateurs
-exports.getAllUsersTest = async (req, res) => {
-    try {
-        const users = await User.findAll({ attributes: { exclude: ['password'] } });
-        res.json(users);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Une erreur est survenue' });
-    }
-};
 
 // Récupérer tous les utilisateurs
 exports.getAllUsers = async (req, res) => {
@@ -48,7 +38,7 @@ exports.getUsersMe = async (req, res) => {
 exports.getUserById = async (req, res) => {
     try {
         const idUser = req.params.id
-        const user = await User.findByPk(idUser.trim());
+        const user = await User.findByPk(idUser.trim(), { attributes: { exclude: ['password'] } });
         if (user) {
             res.json(user);
         } else {
@@ -106,7 +96,7 @@ exports.createUser = async (req, res) => {
             firstname,
             lastname,
             email,
-            password: hashedPassword, // Attention : il faut hasher le mot de passe avant de le stocker
+            password: hashedPassword,
             roles,
         });
 
@@ -123,7 +113,7 @@ exports.updateUserInfo = async (req, res) => {
     const { firstname, lastname } = req.body;
 
     try {
-        const user = await User.findByPk(userId);
+        const user = await User.findByPk(userId, { attributes: { exclude: ['password'] } });
         if (!user) {
             // L'utilisateur n'existe pas
             return res.status(404).json({ error: 'Utilisateur non trouvé.' });
