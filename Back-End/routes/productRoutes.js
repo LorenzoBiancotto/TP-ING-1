@@ -1,20 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const reservationController = require('../controllers/reservationController'); // Assurez-vous que ce chemin est correct
+const productController = require('../controllers/productController'); // Assurez-vous que ce chemin est correct
 
 /**
  * @swagger
  * tags:
- *   name: Reservations
+ *   name: Products
  *   description: API pour la gestion des réservations
  */
 
 /**
  * @swagger
- * /api/reservations:
+ * /api/products:
  *   get:
  *     summary: Récupérer toutes les réservations
- *     tags: [Reservations]
+ *     tags: [Products]
  *     responses:
  *       200:
  *         description: Succès - Renvoie toutes les réservations
@@ -39,14 +39,14 @@ const reservationController = require('../controllers/reservationController'); /
  *       500:
  *         description: Erreur serveur - Une erreur s'est produite lors de la récupération des réservations
  */
-router.get('/', reservationController.getAllReservations);
+router.get('/', productController.getAllProducts);
 
 /**
  * @swagger
- * /api/reservations/{id}:
+ * /api/products/{id}:
  *   get:
  *     summary: Récupérer une réservation par ID
- *     tags: [Reservations]
+ *     tags: [Products]
  *     parameters:
  *       - in: path
  *         name: id
@@ -78,14 +78,14 @@ router.get('/', reservationController.getAllReservations);
  *       500:
  *         description: Erreur serveur - Une erreur s'est produite lors de la récupération de la réservation
  */
-router.get('/:id', reservationController.getReservationById);
+router.get('/:id', productController.getProductById);
 
 /**
  * @swagger
- * /api/reservations/create:
+ * /api/products/create:
  *   post:
  *     summary: Créer une nouvelle réservation
- *     tags: [Reservations]
+ *     tags: [Products]
  *     requestBody:
  *       required: true
  *       content:
@@ -115,14 +115,14 @@ router.get('/:id', reservationController.getReservationById);
  *       500:
  *         description: Erreur serveur - Une erreur s'est produite lors de la création de la réservation
  */
-router.post('/create', reservationController.createReservation);
+router.post('/create', productController.createProduct);
 
 /**
  * @swagger
- * /api/reservations/update/{id}:
+ * /api/products/update/{id}:
  *   put:
  *     summary: Mettre à jour une réservation
- *     tags: [Reservations]
+ *     tags: [Products]
  *     parameters:
  *       - in: path
  *         name: id
@@ -153,14 +153,14 @@ router.post('/create', reservationController.createReservation);
  *       500:
  *         description: Erreur serveur - Une erreur s'est produite lors de la mise à jour de la réservation
  */
-router.put('/update/:id', reservationController.updateReservation);
+router.put('/update/:id', productController.updateProduct);
 
 /**
  * @swagger
- * /api/reservations/delete/{id}:
+ * /api/products/delete/{id}:
  *   delete:
  *     summary: Supprimer une réservation
- *     tags: [Reservations]
+ *     tags: [Products]
  *     parameters:
  *       - in: path
  *         name: id
@@ -176,6 +176,6 @@ router.put('/update/:id', reservationController.updateReservation);
  *       500:
  *         description: Erreur serveur - Une erreur s'est produite lors de la suppression de la réservation
  */
-router.delete('/delete/:id', reservationController.deleteReservation);
+router.delete('/delete/:id', productController.deleteProduct);
 
 module.exports = router;
